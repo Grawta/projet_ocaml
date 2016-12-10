@@ -22,7 +22,9 @@ let ask_move state =
 
 (* Get the move from the IA. *)
 let ia_move state =
+  let t = Sys.time() in
   let (mov, _) = Game_ia.best_move state in
+  Printf.printf"Temps execution : %f%!" (Sys.time()-.t);
   match mov with
   | None -> assert false
   | Some m -> m
