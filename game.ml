@@ -5,7 +5,7 @@ type state = (int matrix) * player
 type piece = int 
 type move = int*piece
 (*On fait des moves le pad ex: 9 = diagonale droite 8=haut*)
-type result = Win of player
+type result = int
 
 
 let carte_init =  [|[|5;6;7;8|];
@@ -17,7 +17,10 @@ let carte_init =  [|[|5;6;7;8|];
 (* Printers *)
 let state2s (n,p) = Printf.sprintf "Current = %s  // %s to play" (matrix2s n string_of_int) (player2s p)
 let move2s (y,p) = Printf.sprintf " Mouvement %d par la piece numero : %d" y p
-let result2s (Win p) = (player2s p) ^ " wins"
+let result2s  n = match n with
+	|(-5) -> (player2s Comput) ^ " wins"
+	|(5) -> (player2s Human) ^ " wins"
+	| _ -> failwith "Euh no winner not cool"
 
 (* Reader *)
 let readmove s=     try Some (Scanf.sscanf s "%d %d" (fun n x -> (n,x)))
@@ -139,27 +142,74 @@ let all_moves stat =
   |(current,Human) -> if(find_cell current (fun x -> (x < 5 && x > 0)) = None) then Some (Win Comput) else None
   |(current,Comput) ->if(find_cell current (fun x -> x >4) = None) then Some (Win Human) else None
 ;;*)
+let calcul (current,_) =
+			let rec loop1 current num cpt =
+						if (num <5) then
+							begin match find_cell current (fun x -> (x=num)) with
+                       		 |None -> loop1 current (num+1) cpt
+                       		 |_-> loop1 current (num+1) (cpt +1) 
+                       		end
+                       	else if (num <9) then
+							begin match find_cell current (fun x -> (x=num)) with
+                       		 |None -> loop1 current (num+1) cpt
+                       		 |_-> loop1 current (num+1) (cpt -1) 
+                       		end
+                       	else
+                       		cpt
+                       	in
+                       	loop1 current 1 0
+	
+;;
 
 
 let result = function
   |(current,Human) -> begin match find_cell current (fun x -> (x < 5 && x >0)) with
-                        |None -> Some (Win (Comput))
+                        |None -> Some (-5)
                         |_ -> None
                       end
   |(current,Comput) ->begin match find_cell current (fun x -> x > 4) with
-                        |None -> Some (Win (Human))
+                        |None -> Some (5)
                         |_ -> None
                       end
 ;;
+
+
 
 (* This type was given in game.mli.
  * We have to repeat it here. *)
 type comparison = Equal | Greater | Smaller
 
-let compare playeur r1 r2 = match (playeur,r1,r2) with
+(* let compare playeur r1 r2 = match (playeur,r1,r2) with
 	|Human,Win Human, Win Comput |Comput , Win Comput, Win Human -> Smaller
 	|Human, Win Comput, Win Human | Comput,Win Human, Win Comput -> Greater
 	|_,_,_ -> Equal  
+;; *)
+
+
+
+let compare playeur r1 r2 = match playeur with
+	|Human  -> if (r1 > r2) then
+						 Smaller 
+				   	else if (r1 < r2) then
+						Greater
+					else 
+						Equal
+	|Comput ->  if (r1 < r2) then
+						 Smaller 
+				   	else if (r1 > r2) then
+						Greater
+					else 
+						Equal
 ;;
 
-let worst_for playeur = Win (next playeur);; 
+
+let worst_for playeur = match playeur with
+			|Human -> (-5)
+			| Comput -> (5)				
+;; 
+
+
+(*Attention pas le notre*)
+let best_for p = match p with
+			|Human -> (5)
+			| Comput -> (-5)
