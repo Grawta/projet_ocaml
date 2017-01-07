@@ -72,4 +72,4 @@ val compare: player -> result -> result -> comparison
 (* Returns the worst possible score for the given player. Useful for computing min or max.
  * The worst for H is supposed to be the best for C, and conversely. *)
 val worst_for: player -> result
-val best_for : player -> result  
+

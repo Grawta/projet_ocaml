@@ -54,6 +54,8 @@ val play: state -> move -> state
  * Moves will be filtered by is_valid anyway. *)
 val all_moves: state -> move list
 
+(* Renvoi la différence de pion entre les deux joueurs *)
+val calcul : state -> result
 (* Returns the result of the game. None if the result is not known yet. *)
 val result: state -> result option
 
@@ -70,4 +72,4 @@ val compare: player -> result -> result -> comparison
 (* Returns the worst possible score for the given player. Useful for computing min or max.
  * The worst for H is supposed to be the best for C, and conversely. *)
 val worst_for: player -> result
-  
+
